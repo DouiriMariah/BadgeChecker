@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check if PNG Image Pixels are within a Circle</title>
+<style>
+    #canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+<h2>Select an image file</h2>
+<input type="file" id="fileInput">
+
+<h2>Result:</h2>
+<div id="result"></div>
+
+<canvas id="canvas"></canvas>
+
+<script src="BadgeChecker.js"></script>
+<script>
+document.getElementById('fileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert('Please select an image file.');
+        return;
+    }
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const pngDataURL = canvas.toDataURL('image/png'); //Convert canvas content to png data url  
+        const pngImg = new Image();
+        pngImg.src = pngDataURL;
+        
+        pngImg.onload = function() {
+            canvas.width = pngImg.width;
+            canvas.height = pngImg.height;
+            ctx.drawImage(pngImg, 0, 0);
+            // Get the image data
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            //Call the badge checker 
+            const isValid = validateBadgeImage(imageData);
+            if (isValid) {
+                document.getElementById('result').textContent = 'Badge is validated!';
+            } else {
+                document.getElementById('result').textContent = 'Badge is not validated.';
+            }
+        };
+    };
+    img.src = URL.createObjectURL(file); 
+});
+</script>
+</body>
+</html>
